@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+<!--         <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>-->
+<!--    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
+    <title>Pocket-Doc</title>
+</head>
+<body>
+
+<body>
+
+    <style>
+        body {
+            transition: background-color 0.5s ease;
+        }
+    </style>
+
+
+
+<!---->
+    <div class="video-background-container">
+
+        <video autoplay muted loop class="video-background">
+            <source src="Pocket-Doc%20feature%20prototype.mp4" type="video/mp4">  <!-- Replace with your video source -->
+            Your browser does not support the video tag.
+        </video>
+        <div class="overlay"></div> <!-- Optional: Overlay for better text visibility -->
+        <div class="content">
+            <h1>Pocket-Doc App : Medical Diagnosis Application</h1>
+                <h3>Engage with a modern and interactive digital healthcare system.</h3>
+        </div>
+
+            <div>
+                <!-- Severity Legend -->
+        <div class="severity-legend">
+            <h2>Severity Legend</h2>
+            <ul>
+                <li><div class="legend-color" style="background-color: #ff0000;"></div>Critical Severity Condition </li>
+                <li><div class="legend-color" style="background-color: #f16f6f;"></div>High Severity Condition </li>
+                <li><div class="legend-color" style="background-color: #da6e44;"></div>Moderate Severity Condition </li>
+                <li><div class="legend-color" style="background-color: #99ff99;"></div>Low Severity Condition </li>
+            </ul>
+        </div>
+    </div>
+
+    </div>
+
+</body>
+
+<!---->
+
+<div class="container">
+    <h1>Pocket-Doc App</h1>
+
+    <label for="symptomSelect"> What are your Symptoms? </label>
+    <p> Select as many symptoms that match your condition: </p>
+<!--    <br><br>-->
+
+    <select id="symptomSelect">
+        {% for symptom in symptoms %}
+            <option value="{{ symptom }}">{{ symptom }}</option>
+        {% endfor %}
+    </select>
+    <button type="button" onclick="addSymptom()">Add Symptom</button><br><br>
+
+    <h3>Selected Symptoms:</h3>
+    <ul id="selectedSymptomsList"></ul>
+
+    <button type="button" onclick="getDiagnosis()">Get Diagnosis</button>
+
+
+<!--    <div>-->
+<!--        <div id="diagnosis"></div>-->
+<!--                    <button type="button" onclick="openModal({diagnosis})">Info </button>-->
+
+<!--    </div>-->
+
+        <div class="diagnosis-result" id="diagnosis-result" >
+        <!-- Diagnosis result and severity plot will be injected here -->
+
+    </div>
+
+
+<!--    </div>-->
+<!--    <div>{{ severity_plot |safe}} </div>-->
+<!--        <h1>Diagnosiszzz: {{ diagnosis }}</h1>-->
+<!--    <div id="severity-plot">-->
+<!--        {{ severity_plot|safe }}-->
+<!--    </div>-->
+
+
+
+<!--       <div id="chat">-->
+<!--        <h2>Diagnosis Chat</h2>-->
+<!--        <div id="messages"></div>-->
+<!--    </div>-->
+
+<!--&lt;!&ndash;    <div id="plot"></div>&ndash;&gt;-->
+<!--    &lt;!&ndash; Modal for Diagnosis Description &ndash;&gt;-->
+<!--    <div id="diagnosisModal" class="modal">-->
+<!--        <div class="modal-content">-->
+<!--            <span class="close">&times;</span>-->
+<!--            <h2 id="modal-title">Diagnosis Details</h2>-->
+<!--            <p id="modal-description">Description of the diagnosis will be displayed here.</p>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
+<div>
+    <a class="reload-button" href="/">Reload</a>
+</div>
+
+</div>
+
+<!--    -->
+<!--    -->
+<!--&lt;!&ndash;    &ndash;&gt;-->
+<!--<div class="card">-->
+<!--  <img src="" alt="Image" class="card-img">-->
+<!--  <div class="card-content">-->
+<!--    <h2 class="card-title">Stylish Card</h2>-->
+<!--    <p class="card-text">This is a stylish card component with modern design elements.</p>-->
+<!--    <button class="button">Learn More</button>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<style>-->
+<!--  .card {-->
+<!--    background: white;-->
+<!--    border-radius: 12px;-->
+<!--    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);-->
+<!--    overflow: hidden;-->
+<!--    transition: transform 0.3s ease;-->
+<!--  }-->
+
+<!--  .card:hover {-->
+<!--    transform: scale(1.05);-->
+<!--  }-->
+
+<!--  .card-img {-->
+<!--    width: 100%;-->
+<!--    height: auto;-->
+<!--  }-->
+
+<!--  .card-content {-->
+<!--    padding: 20px;-->
+<!--  }-->
+
+<!--  .card-title {-->
+<!--    font-family: 'Montserrat', sans-serif;-->
+<!--    margin: 0;-->
+<!--    color: #333;-->
+<!--  }-->
+
+<!--  .card-text {-->
+<!--    color: #666;-->
+<!--  }-->
+
+<!--  .button {-->
+<!--    background: #3498db;-->
+<!--    color: white;-->
+<!--    border: none;-->
+<!--    padding: 12px 24px;-->
+<!--    border-radius: 8px;-->
+<!--    cursor: pointer;-->
+<!--    transition: background 0.3s ease;-->
+<!--  }-->
+
+<!--  .button:hover {-->
+<!--    background: #2980b9;-->
+<!--  }-->
+<!--</style>-->
+
+<!--    -->
+<!--    -->
+<!--    -->
+
+    <script>
+        const selectedSymptoms = [];
+
+        function addSymptom() {
+            const symptomSelect = document.getElementById('symptomSelect');
+            const selectedSymptom = symptomSelect.value;
+
+            if (selectedSymptoms.includes(selectedSymptom)) {
+                alert('This symptom is already added.');
+                return;
+            }
+
+            selectedSymptoms.push(selectedSymptom);
+
+            // Display the selected symptom
+            const symptomsList = document.getElementById('selectedSymptomsList');
+            const li = document.createElement('li');
+            li.textContent = selectedSymptom;
+            symptomsList.appendChild(li);
+        }
+
+        function getDiagnosis() {
+            if (selectedSymptoms.length < 2) {
+                alert('Please add at least two symptoms.');
+                return;
+            }
+
+            fetch('/diagnose', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ selected_symptoms: selectedSymptoms })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // document.getElementById('diagnosis').innerText = 'Diagnosis: ' + data.diagnosis;
+
+                    displayDiagnosis(data.diagnosis, data.description);
+
+        //                            // Severity and color mapping
+        // var severityColors = {
+        //     'Allergy': '#ff9999',  // Red for high severity
+        //     'Fungal infection': '#ffcc99',  // Orange for moderate severity
+        //     'Condition C': '#99ff99',  // Green for low severity
+        //     // Add more mappings as needed
+        // };
+        
+        
+        // Severity and color mapping
+        var severityColors = {
+"Allergy": '#43ff43',  // Green for low severity
+    "Varicose veins": '#43ff43',  // Green for low severity
+    "GERD": '#43ff43',  // Green for low severity
+    "Hypothyroidism": '#da6e44',  // Orange for moderate severity
+    "Osteoarthristis": '#43ff43',  // Green for low severity
+    "Arthritis": '#43ff43',  // Green for low severity
+    "(vertigo) Paroymsal  Positional Vertigo": '#43ff43',  // Green for low severity
+    "Acne": '#43ff43',  // Green for low severity
+    "Drug Reaction": '#43ff43',  // Green for low severity
+    "Diabetes": '#da6e44',  // Orange for moderate severity
+    "Gastroenteritis": '#da6e44',  // Orange for moderate severity
+    "Hypertension": '#f16f6f',  // Light Red for severity
+    "Migraine": '#43ff43',  // Green for low severity
+    "Typhoid": '#43ff43',  // Green for low severity
+    "Psoriasis": '#43ff43',  // Green for low severity
+    "Impetigo": '#43ff43',  // Green for low severity
+    "Hepatitis A": '#da6e44',  // Orange for moderate severity
+    "Hepatitis E": '#da6e44',  // Orange for moderate severity
+    "Alcoholic hepatitis": '#43ff43',  // Green for low severity
+    "Common Cold": '#43ff43',  // Green for low severity
+    "Dimorphic hemmorhoids(piles)": '#43ff43',  // Green for low severity
+    "Fungal infection": '#43ff43',  // Green for low severity
+    "Peptic ulcer diseae": '#da6e44',  // Orange for moderate severity
+    "Chronic cholestasis": '#da6e44',  // Orange for moderate severity
+    "Bronchial Asthma": '#da6e44',  // Orange for moderate severity
+    "Cervical spondylosis": '#da6e44',  // Orange for moderate severity
+    "Malaria": '#da6e44',  // Orange for moderate severity
+    "Dengue": '#da6e44',  // Orange for moderate severity
+    "Hypoglycemia": '#da6e44',  // Orange for moderate severity
+    "Urinary tract infection": '#da6e44',  // Orange for moderate severity
+    "Hepatitis B": '#da6e44',  // Orange for moderate severity
+    "Hepatitis C": '#da6e44',  // Orange for moderate severity
+    "Hepatitis D": '#da6e44',  // Orange for moderate severity
+    "AIDS": '#f16f6f',  // Light Red for severity
+    "Jaundice": '#da6e44',  // Orange for moderate severity
+    "Chicken pox": '#da6e44',  // Orange for moderate severity
+    "Tuberculosis": '#f16f6f',  // Light Red for severity
+    "Heart attack": '#ff0000',  // Red for high severity
+    "Paralysis (brain hemorrhage)": '#ff0000',  // Red for high severity
+        };
+
+                    // Change background color based on the diagnosis
+                     var diagnosisResults = document.getElementById('diagnosis-result');
+            diagnosisResults.style.backgroundColor = severityColors[data.diagnosis] || '#4b608f';  // Default to white
+
+
+            var body = document.body;
+            body.style.backgroundColor = severityColors[data.diagnosis] || '#4b608f';  // Default to white
+
+
+
+        //                     // function displayDiagnosis(diagnosis, severityPlot) {
+        //     document.getElementById('diagnosis-result').innerHTML =
+        //         `<h2>Diagnosisssszzz: ${diagnosis}</h2>` + severityPlot;
+        // // }
+        //
+        // // // Example call - Replace with actual data from the Flask endpoint
+        // displayDiagnosis("Condition A", "{{ severity_plot }}");
+                }
+            });
+        }
+    </script>
+
+<!---->
+    <script>
+
+        //        // Severity and color mapping
+        // var severityColors = {
+        //     'Allergy': '#ff9999',  // Red for high severity
+        //     'Fungal infection': '#ffcc99',  // Orange for moderate severity
+        //     'Condition C': '#99ff99',  // Green for low severity
+        //     // Add more mappings as needed
+        // };
+        //
+        //             // Change background color based on the diagnosis
+        //     var body = document.body;
+        //     body.style.backgroundColor = severityColors[data.diagnosis] || '#ffffff';  // Default to white
+        //
+        //
+        // // Listen for plot update events from the server
+        // socket.on('update_plot', function(data) {
+        //     // Display the diagnosis in the chat
+        //     var messages = document.getElementById('messages');
+        //     var message = document.createElement('p');
+        //     message.textContent = "Diagnosis: " + data.diagnosis + " with severity " + data.severity;
+        //     messages.appendChild(message);
+        //
+        //     // Change background color based on the diagnosis
+        //     var body = document.body;
+        //     body.style.backgroundColor = severityColors[data.diagnosis] || '#ffffff';  // Default to white
+        //
+        //     // Create the plot
+        //     var trace = {
+        //         x: [data.diagnosis],
+        //         y: [data.severity],
+        //         type: 'bar',
+        //         name: data.diagnosis
+        //     };
+        //
+        //     var layout = {
+        //         title: 'Severity of Diagnosis',
+        //         xaxis: { title: 'Diagnosis' },
+        //         yaxis: { title: 'Severity' }
+        //     };
+        //
+        //     Plotly.newPlot('plot', [trace], layout);
+        // });
+
+
+
+
+
+            //         var messages = document.getElementById('messages');
+            // var message = document.createElement('p');
+            // message.textContent = "Diagnosis: " + data.diagnosis + " with severity " + data.severity;
+            // message.onclick = function() { fetchDescription(data.diagnosis, this); };
+            // messages.appendChild(message);
+
+
+
+
+
+
+
+
+
+        // Example: This function can be called with actual diagnosis data from the Flask server
+        function displayDiagnosis(diagnosis, description) {
+            document.getElementById('diagnosis-result').innerHTML =
+                `<h2>Diagnosis: ${diagnosis}</h2>` + `<p class="description">${description}</p>`;
+
+
+            //                         var messages = document.getElementById('diagnosis-result');
+            // var message = document.createElement('p');
+            // message.textContent = "Diagnosis: " + data.diagnosis ;
+            // message.onclick = function() { fetchDescription(data.diagnosis, this); };
+            // messages.appendChild(message);
+        }
+
+//         function fetchDescription(diagnosis, element) {
+//     fetch('/get_description/' + encodeURIComponent(diagnosis))
+//         .then(response => response.json())
+//         .then(data => {
+//             console.log(data.description);  // Log the fetched description
+//         })
+//         .catch(error => console.error('Error fetching description:', error));
+// }
+
+
+
+
+
+
+
+
+
+        // Example call - Replace with actual data from the Flask endpoint
+        // displayDiagnosis(${diagnosis}, "{{ severity_plot }}");
+        // displayDiagnosis("Condition A", "{{ severity_plot }}");
+
+    </script>
+
+
+
+<!--    <script>-->
+<!--        var socket = io();-->
+
+<!--        // Listen for plot update events from the server-->
+<!--        socket.on('update_plot', function(data) {-->
+<!--            // Display the diagnosis in the chat-->
+<!--            var messages = document.getElementById('messages');-->
+<!--            var message = document.createElement('p');-->
+<!--            message.textContent = "Diagnosis: " + data.diagnosis + " with severity " + data.severity;-->
+<!--            messages.appendChild(message);-->
+
+<!--            // Create the plot-->
+<!--            var trace = {-->
+<!--                x: [data.diagnosis],-->
+<!--                y: [data.severity],-->
+<!--                type: 'bar',-->
+<!--                name: data.diagnosis-->
+<!--            };-->
+
+<!--            var layout = {-->
+<!--                title: 'Severity of Diagnosis',-->
+<!--                xaxis: { title: 'Diagnosis' },-->
+<!--                yaxis: { title: 'Severity' }-->
+<!--            };-->
+
+<!--            Plotly.newPlot('plot', [trace], layout);-->
+<!--        });-->
+<!--    </script>-->
+
+
+
+
+<!--&lt;!&ndash;Add some dymanic charts to app&ndash;&gt;-->
+<!--<canvas id="myChart"></canvas>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+<!--<script>-->
+<!--  var ctx = document.getElementById('myChart').getContext('2d');-->
+<!--  var myChart = new Chart(ctx, {-->
+<!--    type: 'bar',-->
+<!--    data: {-->
+<!--      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],-->
+<!--      datasets: [{-->
+<!--        label: '# of Votes',-->
+<!--        data: [12, 19, 3, 5, 2, 3],-->
+<!--        backgroundColor: [-->
+<!--          'rgba(255, 99, 132, 0.2)',-->
+<!--          'rgba(54, 162, 235, 0.2)',-->
+<!--          'rgba(255, 206, 86, 0.2)',-->
+<!--          'rgba(75, 192, 192, 0.2)',-->
+<!--          'rgba(153, 102, 255, 0.2)',-->
+<!--          'rgba(255, 159, 64, 0.2)'-->
+<!--        ],-->
+<!--        borderColor: [-->
+<!--          'rgba(255, 99, 132, 1)',-->
+<!--          'rgba(54, 162, 235, 1)',-->
+<!--          'rgba(255, 206, 86, 1)',-->
+<!--          'rgba(75, 192, 192, 1)',-->
+<!--          'rgba(153, 102, 255, 1)',-->
+<!--          'rgba(255, 159, 64, 1)'-->
+<!--        ],-->
+<!--        borderWidth: 1-->
+<!--      }]-->
+<!--    },-->
+<!--    options: {-->
+<!--      scales: {-->
+<!--        y: {-->
+<!--          beginAtZero: true-->
+<!--        }-->
+<!--      }-->
+<!--    }-->
+<!--  });-->
+<!--</script>-->
+
+</body>
+</html>
