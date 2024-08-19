@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8050:5000"
+    volumes:
+      - .:/pocket_doc_app
+    environment:
+      - FLASK_ENV=development
