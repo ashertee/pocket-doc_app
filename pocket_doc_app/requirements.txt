@@ -3,4 +3,7 @@ pandas
 flask
 tensorflow
 scikit-learn
+json
+flask_socketio
 plotly
+pickle
