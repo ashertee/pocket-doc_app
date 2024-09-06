@@ -1,5 +1,5 @@
 # Import relevant packages
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import numpy as np
 import tensorflow as tf
 import pickle
@@ -297,6 +297,13 @@ def get_description(diagnosis):
     description = descriptions.get(diagnosis, "No description available for this diagnosis.")
     return jsonify({'description': description})
 
+# Route to serve video files
+@app.route('/videos/pck.mp4')
+def video(filename):
+    return send_from_directory('templates', filename)
+
+
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=False, host='0.0.0.0')
