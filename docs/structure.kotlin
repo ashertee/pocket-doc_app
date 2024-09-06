@@ -1,16 +1,27 @@
 pocket-doc/
-├── app/
-│   ├── templates/
-│   │   └── index.html
-│   ├── static/
-│   │   ├── script.js
-│   │   └── style.css
-│   ├── model/
-│   │   ├── encoder.pkl
-│   │   ├── label_encoder.pkl
-│   │   └── pocket_doc_model.h5
-│   └── app.py
-├── data/
-│   └── data.csv
-├── Dockerfile
-└── docker-compose.yml
+│
+├── app.py                     
+├── models/                    
+│   └── diagnosis_model.pkl     
+│   └── pocket_doc_model.h5     
+│   └── pocket_doc_model.keras     
+│
+├── static/                    
+│   ├── styles.css
+│   ├── videos/
+│   │   └── pck.mp4         
+│   ├── script.js              
+│   └── img_pocket_doc.png
+│   └── diagnosis_description.json
+│
+├── templates/                 
+│   └── index.html              
+│
+├── tests/                     
+│   └── test_app.py             
+│
+├── README.md                  
+├── requirements.txt           
+├── model_training.py          
+├── docker-compose.yml
+└── Dockerfile                 
