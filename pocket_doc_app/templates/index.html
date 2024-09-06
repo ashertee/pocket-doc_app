@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Asher Tafadzwa" name="author">
+    <title>Pocket-Doc</title>
+    <link href="/static/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="background-container">
+<!--    <div class="overlay"></div>-->
+    <div class="content">
+        <h1>Pocket-Doc App : Medical Diagnosis Application</h1>
+        <h3>Engage with a modern and interactive digital healthcare system.</h3>
+    </div>
+
+    <div>
+        <!-- Severity Legend -->
+        <div class="severity-legend">
+            <h2>Severity Legend</h2>
+            <ul>
+                <li>
+                    <div class="legend-color" style="background-color: #ff0000;"></div>
+                    Critical Severity Condition
+                </li>
+                <li>
+                    <div class="legend-color" style="background-color: #f16f6f;"></div>
+                    High Severity Condition
+                </li>
+                <li>
+                    <div class="legend-color" style="background-color: #da6e44;"></div>
+                    Moderate Severity Condition
+                </li>
+                <li>
+                    <div class="legend-color" style="background-color: #99ff99;"></div>
+                    Low Severity Condition
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div>
+        <a href="#" id="showVideoLink">Watch Video Tutorial</a>
+
+        <div id="tutorialVideo">
+            <video controls muted width="640">
+                <source src="{{ url_for('static', filename='videos/pck.mp4') }}" type="video/mp4">
+                Your browser does not support the tutorial video.
+            </video>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="container">
+    <h1>Pocket-Doc App</h1>
+
+    <label for="symptomSelect"> What are your Symptoms? </label>
+    <p> Select as many symptoms that match your condition: </p>
+
+
+    <select id="symptomSelect">
+        {% for symptom in symptoms %}
+        <option value="{{ symptom }}">{{ symptom }}</option>
+        {% endfor %}
+    </select>
+    <button onclick="addSymptom()" type="button">Add Symptom</button>
+    <br><br>
+
+    <h3>Selected Symptoms:</h3>
+    <ul id="selectedSymptomsList"></ul>
+
+    <button onclick="getDiagnosis()" type="button">Get Diagnosis</button>
+
+
+    <div class="diagnosis-result" id="diagnosis-result">
+        <!-- Diagnosis result and severity plot will be injected here -->
+
+    </div>
+
+    <div>
+        <a class="reload-button" href="/">Reload</a>
+    </div>
+
+</div>
+
+<script>
+    // Dynamically display video tutorial
+    document.getElementById('showVideoLink').addEventListener('click', function (event) {
+        event.preventDefault();
+        var videoDiv = document.getElementById('tutorialVideo');
+        if (videoDiv.style.display === 'none') {
+            videoDiv.style.display = 'inline-flex';
+        } else {
+            videoDiv.style.display = 'none';
+        }
+    });
+
+    // Function to handle symptom selection
+    const selectedSymptoms = [];
+
+    function addSymptom() {
+        const symptomSelect = document.getElementById('symptomSelect');
+        const selectedSymptom = symptomSelect.value;
+
+        if (selectedSymptoms.includes(selectedSymptom)) {
+            alert('This symptom is already added.');
+            return;
+        }
+
+        selectedSymptoms.push(selectedSymptom);
+
+        // Display the selected symptom
+        const symptomsList = document.getElementById('selectedSymptomsList');
+        const li = document.createElement('li');
+        li.textContent = selectedSymptom;
+        symptomsList.appendChild(li);
+    }
+
+    // Fetch the diagnosis and render to page
+    function getDiagnosis() {
+        if (selectedSymptoms.length < 2) {
+            alert('Please add at least two symptoms.');
+            return;
+        }
+
+        fetch('/diagnose', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({selected_symptoms: selectedSymptoms})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+
+                    displayDiagnosis(data.diagnosis, data.description);
+
+
+                    // Severity and color mapping
+                    var severityColors = {
+                        "Allergy": '#43ff43',  // Green for low severity
+                        "Varicose veins": '#43ff43',  // Green for low severity
+                        "GERD": '#43ff43',  // Green for low severity
+                        "Hypothyroidism": '#da6e44',  // Orange for moderate severity
+                        "Osteoarthristis": '#43ff43',  // Green for low severity
+                        "Arthritis": '#43ff43',  // Green for low severity
+                        "(vertigo) Paroymsal  Positional Vertigo": '#43ff43',  // Green for low severity
+                        "Acne": '#43ff43',  // Green for low severity
+                        "Drug Reaction": '#43ff43',  // Green for low severity
+                        "Diabetes": '#da6e44',  // Orange for moderate severity
+                        "Gastroenteritis": '#da6e44',  // Orange for moderate severity
+                        "Hypertension": '#f16f6f',  // Light Red for severity
+                        "Migraine": '#43ff43',  // Green for low severity
+                        "Typhoid": '#43ff43',  // Green for low severity
+                        "Psoriasis": '#43ff43',  // Green for low severity
+                        "Impetigo": '#43ff43',  // Green for low severity
+                        "Hepatitis A": '#da6e44',  // Orange for moderate severity
+                        "Hepatitis E": '#da6e44',  // Orange for moderate severity
+                        "Alcoholic hepatitis": '#43ff43',  // Green for low severity
+                        "Common Cold": '#43ff43',  // Green for low severity
+                        "Dimorphic hemmorhoids(piles)": '#43ff43',  // Green for low severity
+                        "Fungal infection": '#43ff43',  // Green for low severity
+                        "Peptic ulcer diseae": '#da6e44',  // Orange for moderate severity
+                        "Chronic cholestasis": '#da6e44',  // Orange for moderate severity
+                        "Bronchial Asthma": '#da6e44',  // Orange for moderate severity
+                        "Cervical spondylosis": '#da6e44',  // Orange for moderate severity
+                        "Malaria": '#da6e44',  // Orange for moderate severity
+                        "Dengue": '#da6e44',  // Orange for moderate severity
+                        "Hypoglycemia": '#da6e44',  // Orange for moderate severity
+                        "Urinary tract infection": '#da6e44',  // Orange for moderate severity
+                        "Hepatitis B": '#da6e44',  // Orange for moderate severity
+                        "Hepatitis C": '#da6e44',  // Orange for moderate severity
+                        "Hepatitis D": '#da6e44',  // Orange for moderate severity
+                        "AIDS": '#f16f6f',  // Light Red for severity
+                        "Jaundice": '#da6e44',  // Orange for moderate severity
+                        "Chicken pox": '#da6e44',  // Orange for moderate severity
+                        "Tuberculosis": '#f16f6f',  // Light Red for severity
+                        "Heart attack": '#ff0000',  // Red for high severity
+                        "Paralysis (brain hemorrhage)": '#ff0000',  // Red for high severity
+                    };
+
+                    // Change background color based on the diagnosis to show severity
+                    var diagnosisResults = document.getElementById('diagnosis-result');
+                    diagnosisResults.style.backgroundColor = severityColors[data.diagnosis] || '#4b608f';  // Default to white
+
+
+                    var body = document.body;
+                    body.style.backgroundColor = severityColors[data.diagnosis] || '#4b608f';  // Default to white
+
+                }
+            });
+    }
+
+    // This function can be called with actual diagnosis data from the Flask server
+    function displayDiagnosis(diagnosis, description) {
+        document.getElementById('diagnosis-result').innerHTML =
+            `<h2>Diagnosis: ${diagnosis}</h2>` + `<p class="description">${description}</p>`;
+
+    }
+
+</script>
+</body>
+</html>
